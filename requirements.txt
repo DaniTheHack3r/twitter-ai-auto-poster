@@ -14,7 +14,6 @@ h11==0.14.0
 idna==3.4
 multidict==6.0.4
 oauthlib==3.2.2
-openai==0.27.8
 pydantic==2.1.1
 pydantic_core==2.4.0
 python-dotenv==1.0.0
