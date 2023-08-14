@@ -1,7 +1,6 @@
-from requests_oauthlib import OAuth1Session
 from fastapi.exceptions import HTTPException
-import os
-consumer_key = os.environ.get("API_KEY")
+from utils.http import HTTPManager
+from utils.oauth import sign_oauth
 
 class TwitterManager():
     def __init__(
@@ -15,27 +14,32 @@ class TwitterManager():
         self.consumer_secret = consumer_secret
         self.access_token = access_token
         self.access_token_secret = access_token_secret
+        self.manage_tweets_url = 'https://api.twitter.com/2/tweets'
     
-    def create_tweet(self, text) -> str:
-        twitter = OAuth1Session(
-            self.consumer_key,
-            client_secret=self.consumer_secret,
-            resource_owner_key=self.access_token,
-            resource_owner_secret=self.access_token_secret,
+    async def create_tweet(self, text) -> str:
+        payload = {'text': text}
+        authorization_headers = sign_oauth(
+            consumer_key=self.consumer_key,
+            consumer_secret=self.consumer_secret,
+            access_token=self.access_token,
+            access_token_secret=self.access_token_secret,
+            url=self.manage_tweets_url,
+            http_method='POST',
         )
 
-        response = twitter.post(
-            'https://api.twitter.com/2/tweets',
-            json={'text': text}
+        posted_tweet_info, status_code = await HTTPManager().post(
+            url=self.manage_tweets_url,
+            data=payload,
+            additional_headers=authorization_headers
         )
 
-        if response.status_code != 201:
+        if status_code != 201:
             raise HTTPException(
-                status_code=response.status_code,
-                detail="Request returned an error: {} {}".format(response.status_code, response.text)
+                status_code=status_code,
+                detail="Request returned an error"
             )
 
-        return response.json()
+        return posted_tweet_info
     
     def delete_tweet(self) -> None:
         return
