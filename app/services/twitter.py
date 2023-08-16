@@ -18,10 +18,10 @@ class TwitterManager():
         self.access_token_secret = access_token_secret
         self.manage_tweets_url = 'https://api.twitter.com/2/tweets'
 
-    def craft_payload(self, text: str) -> str:
+    def __craft_payload(self, text: str) -> str:
         return {'text': text}
     
-    def get_authorization_header(self):
+    def __get_authorization_header(self):
         return sign_oauth1(
             consumer_key=self.consumer_key,
             consumer_secret=self.consumer_secret,
@@ -32,8 +32,8 @@ class TwitterManager():
         )
 
     async def create_tweet(self, text: str) -> str:
-        payload = self.craft_payload(text)
-        authorization_header = self.get_authorization_header()
+        payload = self.__craft_payload(text)
+        authorization_header = self.__get_authorization_header()
 
         posted_tweet_info, status_code = await post(
             url=self.manage_tweets_url,

@@ -19,7 +19,7 @@ class GPTManager():
         emojis when convenient and those tweets should be mainly advices. Only return
         the tweet, don't put words before or after."""
 
-    def craft_payload(self, prompt_request: str):
+    def __craft_payload(self, prompt_request: str):
         return {
             'model': 'gpt-3.5-turbo',
             'messages': [
@@ -30,14 +30,14 @@ class GPTManager():
             ]
         }
     
-    def get_authorization_header(self):
+    def __get_authorization_header(self):
         return {
             'Authorization': 'Bearer ' + self.openai_api_key
         }
 
     async def generate_text_with_chat_gpt(self, prompt_request: str) -> str:
-        payload = self.craft_payload(prompt_request)
-        authorization_header = self.get_authorization_header()
+        payload = self.__craft_payload(prompt_request)
+        authorization_header = self.__get_authorization_header()
 
         generated_response, status_code = await post(
             url=self.chat_completions_url,
