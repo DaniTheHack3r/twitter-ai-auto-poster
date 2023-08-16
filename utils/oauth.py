@@ -1,6 +1,8 @@
+from fastapi.security import OAuth2PasswordBearer
 import oauthlib.oauth1
 
-def sign_oauth(
+
+def sign_oauth1(
     consumer_key: str,
     consumer_secret: str,
     access_token: str,
@@ -18,3 +20,5 @@ def sign_oauth(
     _, headers, _ = client.sign(url, http_method)
 
     return headers
+
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")

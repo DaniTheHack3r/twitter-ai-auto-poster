@@ -1,6 +1,8 @@
 from fastapi.exceptions import HTTPException
-from utils.http import HTTPManager
-from utils.oauth import sign_oauth
+
+from utils.http import post
+from utils.oauth import sign_oauth1
+
 
 class TwitterManager():
     def __init__(
@@ -15,10 +17,12 @@ class TwitterManager():
         self.access_token = access_token
         self.access_token_secret = access_token_secret
         self.manage_tweets_url = 'https://api.twitter.com/2/tweets'
+
+    def craft_payload(self, text: str) -> str:
+        return {'text': text}
     
-    async def create_tweet(self, text) -> str:
-        payload = {'text': text}
-        authorization_headers = sign_oauth(
+    def get_authorization_header(self):
+        return sign_oauth1(
             consumer_key=self.consumer_key,
             consumer_secret=self.consumer_secret,
             access_token=self.access_token,
@@ -27,10 +31,14 @@ class TwitterManager():
             http_method='POST',
         )
 
-        posted_tweet_info, status_code = await HTTPManager().post(
+    async def create_tweet(self, text: str) -> str:
+        payload = self.craft_payload(text)
+        authorization_header = self.get_authorization_header()
+
+        posted_tweet_info, status_code = await post(
             url=self.manage_tweets_url,
             data=payload,
-            additional_headers=authorization_headers
+            additional_headers=authorization_header
         )
 
         if status_code != 201:

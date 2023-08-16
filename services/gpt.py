@@ -1,5 +1,7 @@
-from utils.http import HTTPManager
 from fastapi.exceptions import HTTPException
+
+from utils.http import post
+
 
 class GPTManager():
     def __init__(self, openai_api_key) -> None:
@@ -17,8 +19,8 @@ class GPTManager():
         emojis when convenient and those tweets should be mainly advices. Only return
         the tweet, don't put words before or after."""
 
-    async def generate_text_with_chat_gpt(self, prompt_request: str) -> str:
-        payload = {
+    def craft_payload(self, prompt_request: str):
+        return {
             'model': 'gpt-3.5-turbo',
             'messages': [
                 {"role": "system", "content": self.prompt_system},
@@ -27,15 +29,20 @@ class GPTManager():
                 {"role": "user", "content": prompt_request}
             ]
         }
-        
-        authorization_headers = {
+    
+    def get_authorization_header(self):
+        return {
             'Authorization': 'Bearer ' + self.openai_api_key
         }
 
-        generated_response, status_code = await HTTPManager().post(
-            self.chat_completions_url,
-            payload,
-            authorization_headers
+    async def generate_text_with_chat_gpt(self, prompt_request: str) -> str:
+        payload = self.craft_payload(prompt_request)
+        authorization_header = self.get_authorization_header()
+
+        generated_response, status_code = await post(
+            url=self.chat_completions_url,
+            data=payload,
+            additional_headers=authorization_header
         )
 
         if status_code != 200:
