@@ -16,6 +16,7 @@ from schemas.token import Token
 from utils.jwt import create_access_token, validate_token
 from utils.password import authenticate_user
 
+print('test')
 
 TWITTER_API_KEY = os.getenv('TWITTER_API_KEY')
 TWITTER_API_KEY_SECRET = os.getenv('TWITTER_API_KEY_SECRET')
